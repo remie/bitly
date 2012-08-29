@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="Bitly" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Bit.ly</name>
+	<description>Symphony CMS extension for Bit.ly URL's</description>
+	<repo type="github">https://github.com/remie/bit.ly</repo>
+	<url type="discuss">http://symphony-cms.com/discuss/thread/404/</url>
+	<types>
+		<type>Workflow</type>
+	</types>
+	<authors>
+		<author>
+			<name github="remie">Remie Bolte</name>
+			<website>https://github.com/remie</website>
+		</author>
+	</authors>
+	<releases>
+		<release version="0.1.0" date="2012-08-29" min="2.3" max="2.3.x" />
+	</releases>
+</extension>
