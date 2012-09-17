@@ -1,5 +1,7 @@
 <?php
 
+    define('BITLY_CACHE', MANIFEST . '/cache/bitly');
+
     class Extension_bitly extends Extension {
     
     	/*-------------------------------------------------------------------------
@@ -47,14 +49,67 @@
     	}
     
 		public function frontendParamsResolve($context) {
-            $options = 'apikey=' . Symphony::Configuration()->get('apikey', 'bitly') . '&';
-            $options .= 'login=' . Symphony::Configuration()->get('login', 'bitly') . '&';
-            $options .= 'longUrl=' . $context["params"]["current-url"];
+            $url = $context["params"]["current-url"];
 
-            $result = file_get_contents('https://api-ssl.bitly.com/v3/shorten/?' . $options);
-            $data = json_decode($result, true);
-            $context["params"]["tinyurl"] = $data["data"]["url"];
+            try {
+                $result = $this->getFromCache($url);
+
+                if($result == false) {
+                    $options = 'apikey=' . Symphony::Configuration()->get('apikey', 'bitly') . '&';
+                    $options .= 'login=' . Symphony::Configuration()->get('login', 'bitly') . '&';
+                    $options .= 'longUrl=' . $url;
+                    $response = file_get_contents('https://api-ssl.bitly.com/v3/shorten/?' . $options);
+                    $data = json_decode($response, true);
+                    $result = $data["data"]["url"];
+                }
+
+                $context["params"]["tinyurl"] = $result;
+                $this->persist($url, $result);
+            } catch(Exception $exp) {
+                $context["params"]["tinyurl"] = '';
+            }
 		}
+
+        /*-------------------------------------------------------------------------
+            Private functions
+        -------------------------------------------------------------------------*/ 
+
+        private function getFromCache($url) {
+            if(file_exists(BITLY_CACHE)) {
+                $cache = file_get_contents(BITLY_CACHE);
+                $cache = json_decode($cache, true);
+
+                $token = md5($url);
+                if(array_key_exists($token, $cache[0])) {
+                    return $cache[0][$token]["tinyurl"];
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        private function persist($url, $result) {
+            $cache = array();
+            $cache[] = array();
+
+            if(file_exists(BITLY_CACHE)) {
+                $cache = file_get_contents(BITLY_CACHE);
+                $cache = json_decode($cache, true);
+            }
+
+            $token = md5($url);
+            if(!array_key_exists($token, $cache)) {
+                $cache[0][$token] = array(
+                    "url" => $url,
+                    "tinyurl" => $result
+                );
+            }
+
+            $cache = json_encode($cache);
+            General::writeFile(BITLY_CACHE, $cache);
+        }
 
     }
 
