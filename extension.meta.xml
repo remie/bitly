@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension id="Bitly" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+<extension id="bitly" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	<name>Bit.ly</name>
 	<description>Symphony CMS extension for Bit.ly URL's</description>
 	<repo type="github">https://github.com/remie/bit.ly</repo>
